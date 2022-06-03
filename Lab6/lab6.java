@@ -25,8 +25,8 @@ public class lab6 {
         cache test2 = new cache("Cache #2", 2048, 1, 2);
         cache test3 = new cache("Cache #3", 2048, 1, 4);
         cache test4 = new cache("Cache #4", 2048, 2, 1);
-        // cache test5 = new cache("Cache #5", 2048, 4, 1);
-        // cache test6 = new cache("Cache #6", 2048, 4, 4);
+        cache test5 = new cache("Cache #5", 2048, 4, 1);
+        cache test6 = new cache("Cache #6", 2048, 4, 4);
         cache test7 = new cache("Cache #7", 4096, 1, 1);
 
         try {
@@ -42,31 +42,31 @@ public class lab6 {
                 String[] splitLine = line.split("\t");
                 int address = Integer.parseInt(splitLine[1],16);
 
-                // test1.search(address);
-                // test2.search(address);
-                // test3.search(address);
+                test1.search(address);
+                test2.search(address);
+                test3.search(address);
                 test4.search(address);
-                // test5.search(address);
-                // test6.search(address);
-                //test7.search(address);
+                test5.search(address);
+                test6.search(address);
+                test7.search(address);
 
             }
 
             // print out results for caches
-            // test1.showSummary();
-            // System.out.println("---------------------------");
-            // test2.showSummary();
-            // System.out.println("---------------------------");
-            // test3.showSummary();
-            // System.out.println("---------------------------");
+            test1.showSummary();
+            System.out.println("---------------------------");
+            test2.showSummary();
+            System.out.println("---------------------------");
+            test3.showSummary();
+            System.out.println("---------------------------");
             test4.showSummary();
             System.out.println("---------------------------");
-            // test5.showSummary();
-            // System.out.println("---------------------------");
-            // test6.showSummary();
-            // System.out.println("---------------------------");
-            // test7.showSummary();
-            // System.out.println("---------------------------");
+            test5.showSummary();
+            System.out.println("---------------------------");
+            test6.showSummary();
+            System.out.println("---------------------------");
+            test7.showSummary();
+            System.out.println("---------------------------");
 
         } catch (IllegalStateException | FileNotFoundException e) {
             // if trouble opening file

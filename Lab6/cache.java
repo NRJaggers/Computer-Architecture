@@ -9,7 +9,6 @@
 
 package Lab6;
 
-import java.util.HashMap;
 import java.lang.Math;
 
 public class cache {
@@ -32,9 +31,7 @@ public class cache {
     public float hitRate;
     public int[][] tagTable;
     public boolean[][] validBits;
-
-    public HashMap<Integer, Integer> lru; // = new HashMap<int,int>();
-    // add valib bit array
+    public int[][] lineNumTable; // parallel array to tagTable, table for LRU (least recently used)
 
     // ---METHODS---
     // constructors
@@ -52,7 +49,7 @@ public class cache {
         hitRate = 0;
         tagTable = null;
         validBits = null;
-        lru = new HashMap<Integer, Integer>();
+        lineNumTable = null;
 
     }
 
@@ -62,15 +59,15 @@ public class cache {
         sizeTotal = totalSize;
         ways = Associativity;
         sizeBlock = blockSize;
-        bitsBlocks = (int)(Math.log(sizeBlock)/Math.log(2));
-        sizeIndex = totalSize / (ways * (blockSize*4));
-        bitsIndex = (int)(Math.log(sizeIndex)/Math.log(2));
+        bitsBlocks = (int) (Math.log(sizeBlock) / Math.log(2));
+        sizeIndex = totalSize / (ways * (blockSize * 4));
+        bitsIndex = (int) (Math.log(sizeIndex) / Math.log(2));
         searches = 0;
         hits = 0;
         hitRate = 0;
         tagTable = new int[ways][sizeIndex];
         validBits = new boolean[ways][sizeIndex];
-        lru = new HashMap<>();
+        lineNumTable = new int[ways][sizeIndex];
     }
 
     // search method
@@ -79,14 +76,14 @@ public class cache {
         boolean found;
 
         // mask out index and offsets
-        //math notation
+        // math notation
         int byteOffset = memAddress % 4;
         int blockOffset = (memAddress / 4) % sizeBlock;
         int index = ((memAddress / 4) / sizeBlock) % (sizeIndex);
         int tag = ((memAddress / 4) / sizeBlock) / (sizeIndex);
 
         // go through different ways and see if the address is
-        // present in cache at the index and block offset
+        // present in cache at the index
         found = false;
         for (int way = 0; way < ways; way++) {
             if (validBits[way][index] == true) // check valid bit
@@ -99,8 +96,8 @@ public class cache {
                     hits++;
 
                     // adjust LRU (Least Recently Used)
-                    hash(tag, searches);
-                    
+                    lineNumTable[way][index] = searches;
+
                 }
             }
 
@@ -127,31 +124,30 @@ public class cache {
                 empty = true;
 
                 // fill spot with address
-                // dataTable[way][index][blockOffset][byteOffset] = memAddress;
                 tagTable[way][index] = tag;
 
                 // flip valid bit to true
                 validBits[way][index] = true;
 
-                //leave loop
+                // update lru table
+                lineNumTable[way][index] = searches;
+
+                // leave loop
                 break;
             }
 
         }
 
-        // if there are no empty spot available, replace LRU
+        // if there are no empty spots available, replace LRU
         // least recently used
         if (!empty) {
-            // getting from line numbe lru and comparing with currentLowest line number()
-            // if(lru.get(tagTable[way][index])<currentLowest)
-            // lowestTag = tagfrom Array
-            // currentLowest = lru.get(tagTable[way][index])
+            // getting from line number lru and comparing with currentLowest line number
             int currentLowest = 5000001;
             int lowestTag = 0;
             for (int way = 0; way < ways; way++) {
-                if (lru.get(tagTable[way][index]) < currentLowest) {
+                if (lineNumTable[way][index] < currentLowest) {
                     lowestTag = tagTable[way][index];
-                    currentLowest = lru.get(tagTable[way][index]);
+                    currentLowest = lineNumTable[way][index];
                 }
 
             }
@@ -162,32 +158,14 @@ public class cache {
                 if (tagTable[way][index] == lowestTag) {
                     // fill spot with address
                     tagTable[way][index] = tag;
+                    // update lru table
+                    lineNumTable[way][index] = searches;
                 }
 
             }
         }
-
-        // update hash?
-        hash(tag, searches);
     }
-
-    // least recently used hashmap method: Key: tag and value : line number
-    // inputs: tag, line number
-    // for given index, want to check two tags and whichever one is lesser, replace
-    // that one
-    public void hash(int tag, int linenum) {
-        // have check for update or add
-        if (lru.containsKey(tag)) {
-            // update LRU value
-            lru.replace(tag, linenum);
-
-        } else {
-            // add tag and line number to LRU
-            lru.put(tag, linenum);
-        }
-
-    }
-
+    
     // print method
     public void showSummary() {
         // Cache #1
